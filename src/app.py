@@ -55,3 +55,5 @@ if uploaded_file:
         ax.set_title(column)
         
         st.pyplot(fig)
+
+# Para ejecutar: streamlit run app.py
