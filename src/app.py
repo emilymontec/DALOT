@@ -4,10 +4,14 @@ import matplotlib.pyplot as plt
 
 from analyzer import analyze_data
 from insights import generate_insights
-from llm import generate_ai_report
 from scoring import calculate_business_score
+from llm import (
+    generate_ai_report,
+    chat_with_data
+)
+from trends import analyze_trends
 
-st.title("DALOT: Analyst MVP")
+st.title("NURA: AI Analyst MVP")
 
 uploaded_file = st.file_uploader(
     "Sube un archivo CSV",
@@ -26,6 +30,9 @@ if uploaded_file:
     # ANALISIS
     results = analyze_data(df)
 
+    # TENDENCIAS
+    trend_data = analyze_trends(df)
+
     # SCORING
     score_data = calculate_business_score(results)
 
@@ -35,6 +42,10 @@ if uploaded_file:
     # METRICAS
     st.subheader("Métricas")
     st.json(results)
+
+    # TENDENCIAS
+    st.subheader("Trend Analysis")
+    st.json(trend_data)
 
     # BUSINESS HEALTH
     st.subheader("Business Health")
@@ -69,7 +80,24 @@ if uploaded_file:
 
         st.write(f"- {insight}")
 
-    # IA REPORT
+    # CONTEXTO IA
+    analysis_context = f"""
+
+    Resultados:
+    {results}
+
+    Tendencias:
+    {trend_data}
+
+    Scoring:
+    {score_data}
+
+    Insights:
+    {insights}
+
+    """
+
+    # REPORTE IA
     st.subheader("Reporte IA")
 
     try:
@@ -106,4 +134,28 @@ if uploaded_file:
 
         st.pyplot(fig)
 
-# Para ejecutar: streamlit run app.py
+    # CHAT IA
+    st.subheader("AI Analyst Chat")
+
+    user_question = st.chat_input(
+        "Pregunta sobre los datos..."
+    )
+
+    if user_question:
+
+        with st.chat_message("user"):
+
+            st.write(user_question)
+
+        with st.chat_message("assistant"):
+
+            with st.spinner(
+                "Analizando datos..."
+            ):
+
+                response = chat_with_data(
+                    analysis_context,
+                    user_question
+                )
+
+                st.write(response)
