@@ -1,129 +1,154 @@
 <div class="app-shell">
-    <section class="hero-card">
-        <div class="hero-copy">
-            <span class="eyebrow">NURA Conversational Intelligence</span>
-            <h1>Analiza archivos empresariales, detecta riesgos y conversa con tu IA analista.</h1>
-            <p>
-                Plataforma de inteligencia artificial para convertir datos complejos en insights estrategicos,
-                alertas accionables y respuestas ejecutivas en tiempo real.
-            </p>
-            <div class="hero-actions">
-                <button class="btn btn-primary" onclick="openFilePicker()">Cargar archivo</button>
-                <button class="btn btn-secondary" onclick="testAPI()">Verificar backend</button>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark" aria-hidden="true">
+                <span class="node node-pink"></span>
+                <span class="node node-cyan"></span>
+                <span class="node node-blue"></span>
+            </div>
+            <div class="brand-copy">
+                <strong>NURA</strong>
+                <span>INTELLIGENCE</span>
             </div>
         </div>
-        <div class="hero-status">
-            <div class="status-card">
-                <span class="status-label">Estado de API</span>
-                <strong id="api-status">Comprobando...</strong>
-                <small id="api-status-detail">Validando conectividad del backend y del motor IA.</small>
+
+        <div class="topbar-actions">
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                <div>
+                    <strong id="api-status">Comprobando...</strong>
+                    <small id="api-status-detail">Validando conectividad del backend.</small>
+                </div>
             </div>
-            <div class="status-card">
-                <span class="status-label">Sesion activa</span>
+            <button class="btn btn-secondary" onclick="testAPI()">Verificar</button>
+        </div>
+    </header>
+
+    <section class="intro-panel">
+        <div class="intro-copy">
+            <span class="eyebrow">Analisis conversacional de datos</span>
+            <h1>Sube un archivo, revisa el contexto y conversa con una IA enfocada en decisiones empresariales.</h1>
+            <p>
+                Una interfaz mas simple para centralizar carga, lectura ejecutiva del dataset, indicadores clave
+                y preguntas en lenguaje natural sin perder contexto.
+            </p>
+        </div>
+
+        <div class="intro-meta">
+            <div class="meta-block">
+                <span class="meta-label">Sesion</span>
                 <strong id="session-id-label">Inicializando...</strong>
-                <small>La IA mantiene contexto para analizar y responder sobre tu ultimo archivo.</small>
+            </div>
+            <div class="meta-block">
+                <span class="meta-label">Archivo actual</span>
+                <strong id="selected-file-label">Sin archivo</strong>
             </div>
         </div>
     </section>
 
     <div class="workspace-grid">
-        <section class="analysis-column">
-            <div class="panel upload-panel">
+        <aside class="sidebar">
+            <section class="panel upload-panel">
                 <div class="panel-header">
                     <div>
-                        <span class="panel-kicker">Analisis de archivos</span>
-                        <h2>Sube CSV o Excel</h2>
+                        <span class="panel-kicker">Carga</span>
+                        <h2>Analisis de archivos</h2>
                     </div>
-                    <span class="file-badge" id="selected-file-label">Sin archivo</span>
                 </div>
+
                 <p class="panel-text">
-                    NURA resume estructura, evalua salud de datos, identifica tendencias y genera insights
-                    listos para usarse en decisiones empresariales.
+                    Importa un archivo empresarial y deja que NURA genere un resumen inicial del contexto.
                 </p>
+
                 <input type="file" id="data-upload" accept=".csv,.xlsx,.xls" hidden onchange="handleFileUpload(event)">
+
                 <div class="upload-actions">
                     <button class="btn btn-primary" onclick="openFilePicker()">Seleccionar archivo</button>
-                    <button class="btn btn-ghost" onclick="clearAnalysis()">Limpiar analisis</button>
+                    <button class="btn btn-ghost" onclick="clearAnalysis()">Limpiar</button>
                 </div>
-                <div class="upload-hint" id="upload-hint">
-                    Formatos soportados: `.csv`, `.xlsx`, `.xls`
-                </div>
-            </div>
 
-            <div class="stats-grid">
-                <article class="metric-card">
-                    <span class="metric-label">Archivo</span>
-                    <strong class="metric-value" id="stat-file">Esperando carga</strong>
-                    <small class="metric-detail">Ultimo dataset procesado</small>
-                </article>
-                <article class="metric-card">
-                    <span class="metric-label">Registros</span>
-                    <strong class="metric-value" id="stat-rows">0</strong>
-                    <small class="metric-detail">Filas detectadas</small>
-                </article>
-                <article class="metric-card">
-                    <span class="metric-label">Variables</span>
-                    <strong class="metric-value" id="stat-columns">0</strong>
-                    <small class="metric-detail">Columnas disponibles</small>
-                </article>
-                <article class="metric-card">
-                    <span class="metric-label">Riesgo</span>
-                    <strong class="metric-value" id="stat-risk">Sin evaluar</strong>
-                    <small class="metric-detail" id="stat-health-detail">Salud de datos pendiente</small>
-                </article>
-            </div>
+                <div class="upload-hint" id="upload-hint">Formatos soportados: `.csv`, `.xlsx`, `.xls`</div>
+            </section>
 
-            <div class="panel">
+            <section class="panel metrics-panel">
                 <div class="panel-header">
                     <div>
-                        <span class="panel-kicker">Insights</span>
-                        <h2>Hallazgos estrategicos</h2>
+                        <span class="panel-kicker">Resumen</span>
+                        <h2>Contexto del dataset</h2>
                     </div>
                 </div>
-                <div class="empty-state" id="insights-list">
-                    Carga un archivo para ver alertas, patrones y recomendaciones iniciales.
-                </div>
-            </div>
 
-            <div class="panel">
+                <div class="metrics-list">
+                    <article class="metric-row">
+                        <span class="metric-label">Archivo</span>
+                        <strong class="metric-value compact" id="stat-file">Esperando carga</strong>
+                    </article>
+                    <article class="metric-row">
+                        <span class="metric-label">Registros</span>
+                        <strong class="metric-value" id="stat-rows">0</strong>
+                    </article>
+                    <article class="metric-row">
+                        <span class="metric-label">Variables</span>
+                        <strong class="metric-value" id="stat-columns">0</strong>
+                    </article>
+                    <article class="metric-row">
+                        <span class="metric-label">Riesgo</span>
+                        <strong class="metric-value compact" id="stat-risk">Sin evaluar</strong>
+                    </article>
+                </div>
+
+                <div class="metric-note" id="stat-health-detail">Salud de datos pendiente</div>
+            </section>
+        </aside>
+
+        <section class="content-column">
+            <section class="panel analysis-panel">
                 <div class="panel-header">
                     <div>
-                        <span class="panel-kicker">Tendencias</span>
-                        <h2>Indicadores numericos</h2>
+                        <span class="panel-kicker">Lectura rapida</span>
+                        <h2>Insights y tendencias</h2>
                     </div>
                 </div>
-                <div class="empty-state" id="trends-table">
-                    Aun no hay metricas disponibles para mostrar.
-                </div>
-            </div>
-        </section>
 
-        <section class="chat-column">
-            <div class="panel chat-panel">
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <h3>Hallazgos clave</h3>
+                        <div class="empty-state" id="insights-list">
+                            Carga un archivo para ver alertas, patrones y recomendaciones iniciales.
+                        </div>
+                    </div>
+
+                    <div class="analysis-block">
+                        <h3>Indicadores numericos</h3>
+                        <div class="empty-state" id="trends-table">
+                            Aun no hay metricas disponibles para mostrar.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel chat-panel">
                 <div class="panel-header">
                     <div>
-                        <span class="panel-kicker">Chat IA</span>
-                        <h2>Analista conversacional</h2>
+                        <span class="panel-kicker">Conversacion</span>
+                        <h2>Chat IA</h2>
                     </div>
-                    <span class="chat-chip">Contexto empresarial</span>
+                    <span class="chat-chip">Contexto activo</span>
                 </div>
 
                 <div class="chat-box" id="chat-box">
                     <div class="message bot-msg">
-                        <strong>NURA lista para ayudarte.</strong><br>
-                        Puedes:
-                        <br>1. Subir un archivo empresarial.
-                        <br>2. Revisar salud, riesgo e insights.
-                        <br>3. Hacer preguntas sobre el dataset en lenguaje natural.
+                        <strong>NURA esta lista.</strong><br>
+                        Sube un archivo para generar contexto y luego pregunta por riesgos, tendencias o recomendaciones.
                     </div>
                 </div>
 
                 <div class="composer">
                     <button class="icon-btn" onclick="openFilePicker()" title="Adjuntar archivo">+</button>
-                    <input type="text" id="user-input" placeholder="Pregunta por riesgos, tendencias, anomalias o recomendaciones..." onkeypress="handleKeyPress(event)">
+                    <input type="text" id="user-input" placeholder="Escribe una pregunta sobre el dataset..." onkeypress="handleKeyPress(event)">
                     <button class="btn btn-primary" id="send-button" onclick="sendMessage()">Enviar</button>
                 </div>
-            </div>
+            </section>
         </section>
     </div>
 </div>
