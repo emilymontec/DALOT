@@ -52,11 +52,6 @@ function setText(id, value, title = null) {
     }
 }
 
-function setExecutiveSummary(title, detail) {
-    setText("executive-summary-copy", title, title);
-    setText("executive-summary-detail", detail, detail);
-}
-
 function getRiskTone(riskLevel) {
     const level = String(riskLevel || "").toLowerCase();
     if (level.includes("alto")) {
@@ -89,13 +84,24 @@ function setDatasetState(label, variant = "neutral") {
 
     badge.textContent = label;
     badge.className = `mini-badge ${variant}`;
+    const heroState = document.getElementById("hero-state");
+    if (heroState) {
+        heroState.textContent = label;
+        heroState.className = `mini-badge ${variant}`;
+    }
 }
 
-function updateHeroSummary({ file = "Sin archivo", rows = "0", risk = "Sin evaluar", health = "Salud de datos pendiente.", riskLevel = "" } = {}) {
+function updateHeroSummary({
+    file = "Sin archivo",
+    rows = "0",
+    risk = "Sin evaluar",
+    health = "Conversacion general disponible. Puedes preguntar sin subir archivos.",
+    riskLevel = "",
+} = {}) {
     setText("hero-file", file, file);
     setText("hero-rows", rows);
     setRiskValue("hero-risk", risk, riskLevel);
-    setText("hero-health", health);
+    setText("hero-summary-text", health);
 }
 
 function getRiskLabel(riskLevel, score) {
@@ -123,7 +129,6 @@ function setApiStatus(text, detail, status) {
     detailEl.textContent = detail;
     statusEl.dataset.state = status;
     statusCardEl.classList.toggle("status-error", status === "error");
-    setText("hero-status-label", status === "error" ? "Backend sin conexion" : text === "Comprobando..." ? "Validando backend" : "Backend operativo");
 }
 
 function updateSessionLabel() {
@@ -131,7 +136,6 @@ function updateSessionLabel() {
     if (label) {
         label.textContent = state.sessionId;
     }
-    setText("hero-session", state.sessionId, state.sessionId);
 }
 
 async function testAPI() {
@@ -150,6 +154,11 @@ function addMessage(text, sender, id = null) {
     const chatBox = document.getElementById("chat-box");
     if (!chatBox) {
         return;
+    }
+
+    const welcomeScreen = document.getElementById("welcome-screen-box");
+    if (welcomeScreen) {
+        welcomeScreen.style.display = "none";
     }
 
     const msgDiv = document.createElement("div");
@@ -206,18 +215,18 @@ function clearAnalysis() {
     setRiskValue("stat-risk", "Sin evaluar", "");
     setText("stat-health-detail", "Salud de datos pendiente");
     setText("hero-columns", "0");
-    setText("hero-state", "Sin carga");
-    setText("hero-flow", "Listo para analizar");
+    setText("hero-flow", "Chat general activo");
     updateHeroSummary();
     setDatasetState("Sin carga", "neutral");
-    setExecutiveSummary(
-        "Carga un archivo para activar el resumen automatico del contexto analitico.",
-        "NURA mostrara salud del dato, volumen y señales tempranas para acelerar la evaluacion."
-    );
+
+    const appContainer = document.getElementById("app-container");
+    if (appContainer) {
+        appContainer.classList.remove("show-analytics");
+    }
 
     const elUploadHint = document.getElementById("upload-hint");
     if (elUploadHint) {
-        elUploadHint.innerHTML = "Formatos soportados: <code>.csv</code>, <code>.xlsx</code>, <code>.xls</code>";
+        elUploadHint.innerHTML = "Sube archivos <code>.csv</code>, <code>.xlsx</code> o <code>.xls</code> para activar las analíticas avanzadas.";
     }
 
     const elInsightsList = document.getElementById("insights-list");
@@ -228,7 +237,7 @@ function clearAnalysis() {
     const elTrendsTable = document.getElementById("trends-table");
     if (elTrendsTable) {
         elTrendsTable.classList.remove("has-table");
-        elTrendsTable.innerHTML = "Aun no hay metricas disponibles para mostrar.";
+        elTrendsTable.innerHTML = "Carga un dataset para ver indicadores numéricos y tendencias relevantes.";
     }
 
     const insightsContainer = document.getElementById("insights-container");
@@ -323,7 +332,6 @@ function renderAnalysis(data) {
     setRiskValue("stat-risk", riskLabel, data.health?.risk_level);
     setText("stat-health-detail", healthSummary);
     setText("hero-columns", columnCount);
-    setText("hero-state", "Dataset listo");
     setText("hero-flow", "Analisis disponible");
     updateHeroSummary({
         file: fileName,
@@ -333,14 +341,15 @@ function renderAnalysis(data) {
         riskLevel: data.health?.risk_level,
     });
     setDatasetState("Listo", "success");
-    setExecutiveSummary(
-        `${fileName} procesado con ${rowCount} registros y ${columnCount} variables.`,
-        `Riesgo ${data.health?.risk_level || "no disponible"} con salud ${formatDecimal(data.health?.health_score)}. Usa el chat para profundizar en hallazgos y acciones.`
-    );
+
+    const appContainer = document.getElementById("app-container");
+    if (appContainer) {
+        appContainer.classList.add("show-analytics");
+    }
 
     const elUploadHint = document.getElementById("upload-hint");
     if (elUploadHint) {
-        elUploadHint.textContent = "Analisis generado. Ya puedes preguntar al chat por riesgos, patrones o recomendaciones.";
+        elUploadHint.textContent = "Análisis generado. Ya puedes preguntar al chat por riesgos, patrones o recomendaciones.";
     }
 
     const insightsContainer = document.getElementById("insights-container");
@@ -417,7 +426,6 @@ async function handleFileUpload(event) {
     setText("selected-file-label", file.name, file.name);
     setText("stat-file", file.name, file.name);
     setText("hero-columns", "Calculando");
-    setText("hero-state", "Procesando");
     setText("hero-flow", "Extrayendo señales");
     updateHeroSummary({
         file: file.name,
@@ -427,10 +435,6 @@ async function handleFileUpload(event) {
         riskLevel: "",
     });
     setDatasetState("Procesando", "neutral");
-    setExecutiveSummary(
-        `Procesando ${file.name}.`,
-        "Se estan evaluando volumen, estructura, calidad del dato y tendencias numericas."
-    );
     
     addMessage(`Archivo cargado: ${file.name}`, "user");
 
@@ -491,6 +495,13 @@ function initializeDashboard() {
     }
 }
 
+function toggleAnalytics() {
+    const container = document.getElementById("app-container");
+    if (container) {
+        container.classList.toggle("show-analytics");
+    }
+}
+
 window.testAPI = testAPI;
 window.sendMessage = sendMessage;
 window.handleKeyPress = handleKeyPress;
@@ -499,3 +510,4 @@ window.openFilePicker = openFilePicker;
 window.clearAnalysis = clearAnalysis;
 window.initializeDashboard = initializeDashboard;
 window.usePrompt = usePrompt;
+window.toggleAnalytics = toggleAnalytics;

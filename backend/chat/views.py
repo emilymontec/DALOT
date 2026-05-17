@@ -63,13 +63,22 @@ def chat_endpoint(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            message = data.get("message", "")
+            message = (data.get("message", "") or "").strip()
             session_id = data.get("session_id", "default")
+            if not message:
+                return JsonResponse({"error": "El mensaje no puede estar vacio."}, status=400)
             
             history = memory.get_history(session_id)
             
             # Use the actual context from the session if available
-            context = session_contexts.get(session_id, {"message": "Todavia no se ha cargado ningun dataset."})
+            context = session_contexts.get(
+                session_id,
+                {
+                    "has_dataset": False,
+                    "message": "No hay ningun dataset cargado en esta sesion.",
+                    "mode": "chat_general",
+                },
+            )
             
             # This calls the Groq API
             response = chat_with_data(message, context, history)
