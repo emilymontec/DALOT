@@ -1,6 +1,5 @@
 <div class="app-shell">
     <div class="bg-orb orb-one" aria-hidden="true"></div>
-    <div class="bg-orb orb-two" aria-hidden="true"></div>
     <div class="bg-grid" aria-hidden="true"></div>
 
     <div class="app-container">
@@ -17,97 +16,68 @@
             </div>
 
             <div class="sidebar-content">
-                <section class="panel upload-panel">
-                    <span class="section-title">Inicio rapido</span>
+                <section class="sidebar-actions">
+                    <span class="section-title">Inicio</span>
                     <button class="btn-new-chat" onclick="openFilePicker()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Subir dataset</span>
                     </button>
                     <input type="file" id="data-upload" accept=".csv,.xlsx,.xls" hidden onchange="handleFileUpload(event)">
                     <p id="upload-hint" class="panel-note">Formatos soportados: <code>.csv</code>, <code>.xlsx</code>, <code>.xls</code></p>
-                    <div class="active-file">
-                        <span>Archivo activo</span>
+                </section>
+
+                <section class="summary-section">
+                    <span class="section-title">Dataset</span>
+                    <div class="summary-file">
+                        <span>Activo</span>
                         <strong id="selected-file-label" class="truncate" title="Sin archivo">Sin archivo</strong>
                     </div>
-                </section>
-
-                <section class="panel context-section">
-                    <span class="section-title">Contexto del dataset</span>
-                    <div class="context-card">
-                        <div class="meta-row meta-row-stack">
-                            <div>
-                                <span class="meta-label">Archivo</span>
-                                <strong id="stat-file" class="truncate" title="Esperando carga">Esperando carga</strong>
-                            </div>
-                            <span class="meta-icon meta-icon-soft">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                            </span>
+                    <div class="summary-list">
+                        <div class="summary-row">
+                            <span>Archivo</span>
+                            <strong id="stat-file" class="truncate" title="Esperando carga">Esperando carga</strong>
                         </div>
-
-                        <div class="stats-grid">
-                            <article class="stat-card">
-                                <span class="meta-label">Registros</span>
-                                <strong id="stat-rows">0</strong>
-                            </article>
-                            <article class="stat-card">
-                                <span class="meta-label">Variables</span>
-                                <strong id="stat-columns">0</strong>
-                            </article>
-                            <article class="stat-card stat-card-wide">
-                                <span class="meta-label">Riesgo</span>
-                                <strong id="stat-risk">Sin evaluar</strong>
-                            </article>
+                        <div class="summary-row">
+                            <span>Registros</span>
+                            <strong id="stat-rows">0</strong>
                         </div>
-
-                        <div class="health-card">
-                            <span class="meta-label">Salud del dataset</span>
-                            <p id="stat-health-detail">Salud de datos pendiente</p>
+                        <div class="summary-row">
+                            <span>Variables</span>
+                            <strong id="stat-columns">0</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Riesgo</span>
+                            <strong id="stat-risk">Sin evaluar</strong>
                         </div>
                     </div>
+                    <p id="stat-health-detail" class="summary-health">Salud de datos pendiente</p>
                 </section>
 
-                <section class="panel insights-section" id="insights-container" style="display: none;">
+                <section class="insights-section" id="insights-container" style="display: none;">
                     <span class="section-title">Insights rapidos</span>
                     <div class="insights-list" id="insights-list"></div>
                 </section>
             </div>
 
             <div class="sidebar-footer">
-                <div class="status-card">
-                    <button class="status-indicator" onclick="testAPI()" title="Haz clic para re-verificar">
-                        <span class="status-dot"></span>
-                        <span id="api-status">Conectado</span>
-                    </button>
-                    <p id="api-status-detail">Backend operativo.</p>
-                </div>
-
-                <div class="session-card">
-                    <span class="section-title">Sesion activa</span>
-                    <strong id="session-id-label">Cargando...</strong>
+                <button class="status-indicator" onclick="testAPI()" title="Haz clic para re-verificar">
+                    <span class="status-dot"></span>
+                    <span id="api-status">Conectado</span>
+                </button>
+                <p id="api-status-detail">Backend operativo.</p>
+                <div class="sidebar-meta">
+                    <span>Sesion</span>
+                    <strong id="session-id-label" class="session-inline">Cargando...</strong>
                 </div>
             </div>
         </aside>
 
         <main class="chat-main">
             <header class="workspace-header">
-                <div class="workspace-copy">
-                    <span class="eyebrow">Workspace</span>
-                    <h1>Analiza, conversa y descubre patrones con una experiencia mas clara.</h1>
-                    <p>NURA combina una interfaz limpia con analitica guiada para revisar riesgos, tendencias y contexto de negocio desde un mismo flujo.</p>
-                </div>
-
-                <div class="workspace-panels">
-                    <article class="workspace-panel">
-                        <span class="panel-badge">Enfoque</span>
-                        <h2>Minimalismo funcional</h2>
-                        <p>Jerarquia visual simple, superficies limpias y acentos tomados del logo para mantener coherencia de marca.</p>
-                    </article>
-
-                    <article class="workspace-panel workspace-panel-alt">
-                        <span class="panel-badge">Tendencias</span>
-                        <div id="trends-table" class="trends-placeholder">Aun no hay metricas disponibles para mostrar.</div>
-                    </article>
-                </div>
+                <span class="eyebrow">NURA</span>
+                <h1>Analiza tus datos con una experiencia mas limpia.</h1>
+                <p>Sube un dataset y conversa con una interfaz reducida, clara y enfocada en la lectura de resultados.</p>
+                <div id="trends-table" class="trends-placeholder">Aun no hay metricas disponibles para mostrar.</div>
             </header>
 
             <section class="chat-stage">

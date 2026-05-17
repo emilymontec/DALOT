@@ -153,7 +153,10 @@ function clearAnalysis() {
     if(elInsightsList) elInsightsList.innerHTML = "Carga un archivo para ver alertas, patrones y recomendaciones iniciales.";
     
     const elTrendsTable = document.getElementById("trends-table");
-    if(elTrendsTable) elTrendsTable.innerHTML = "Aun no hay metricas disponibles para mostrar.";
+    if(elTrendsTable) {
+        elTrendsTable.classList.remove("has-table");
+        elTrendsTable.innerHTML = "Aun no hay metricas disponibles para mostrar.";
+    }
 
     const insightsContainer = document.getElementById("insights-container");
     if(insightsContainer) insightsContainer.style.display = "none";
@@ -183,6 +186,7 @@ function renderTrends(trends) {
 
     const entries = Object.entries(trends || {});
     if (!entries.length) {
+        container.classList.remove("has-table");
         container.innerHTML = "El archivo no contiene columnas numericas suficientes para estimar tendencias.";
         return;
     }
@@ -199,6 +203,7 @@ function renderTrends(trends) {
         `)
         .join("");
 
+    container.classList.add("has-table");
     container.innerHTML = `
         <div class="trend-table-wrapper">
         <table class="trend-table">
