@@ -4,6 +4,7 @@ Generated with modular structure and environment variable support.
 """
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 # Load .env variables
@@ -62,17 +63,44 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'nura.wsgi.application'
 
-# Database configuration – default to SQLite, can be overridden via env vars
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('POSTGRES_DB', BASE_DIR / 'db.sqlite3'),
-        'USER': os.getenv('POSTGRES_USER', ''),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-        'HOST': os.getenv('POSTGRES_HOST', ''),
-        'PORT': os.getenv('POSTGRES_PORT', ''),
+SUPABASE_DB_URL = os.getenv('SUPABASE_DB_URL', '').strip()
+USE_SQLITE_LOCAL = os.getenv('USE_SQLITE_LOCAL', 'False').lower() == 'true'
+SQLITE_DB_PATH = os.getenv('SQLITE_DB_PATH', str(BASE_DIR / 'db.sqlite3'))
+
+if USE_SQLITE_LOCAL:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': SQLITE_DB_PATH,
+        }
     }
-}
+elif SUPABASE_DB_URL:
+    parsed_db_url = urlparse(SUPABASE_DB_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': parsed_db_url.path.lstrip('/'),
+            'USER': parsed_db_url.username or '',
+            'PASSWORD': parsed_db_url.password or '',
+            'HOST': parsed_db_url.hostname or '',
+            'PORT': parsed_db_url.port or '5432',
+            'CONN_MAX_AGE': int(os.getenv('DB_CONN_MAX_AGE', '60')),
+            'OPTIONS': {
+                'sslmode': os.getenv('POSTGRES_SSLMODE', 'require'),
+            },
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': os.getenv('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
+            'NAME': os.getenv('POSTGRES_DB', SQLITE_DB_PATH),
+            'USER': os.getenv('POSTGRES_USER', ''),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+            'HOST': os.getenv('POSTGRES_HOST', ''),
+            'PORT': os.getenv('POSTGRES_PORT', ''),
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

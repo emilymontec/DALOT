@@ -19,9 +19,6 @@ from analytics.trends import analyze_numeric_trends
 from analytics.insights import generate_insights
 from analytics.utils import make_json_safe
 
-# Global dictionary to hold session contexts for simplicity in this demo
-session_contexts = {}
-
 @csrf_exempt
 def analyze_endpoint(request):
     """Endpoint to trigger dataset analysis."""
@@ -49,7 +46,7 @@ def analyze_endpoint(request):
                 "insights": insights
             }
             safe_context = make_json_safe(context)
-            session_contexts[session_id] = safe_context
+            memory.store_dataset_context(session_id, safe_context)
             
             return JsonResponse(safe_context)
         except Exception as e:
@@ -68,17 +65,13 @@ def chat_endpoint(request):
             if not message:
                 return JsonResponse({"error": "El mensaje no puede estar vacio."}, status=400)
             
-            history = memory.get_history(session_id)
+            history = memory.get_history(session_id, message)
             
-            # Use the actual context from the session if available
-            context = session_contexts.get(
-                session_id,
-                {
-                    "has_dataset": False,
-                    "message": "No hay ningun dataset cargado en esta sesion.",
-                    "mode": "chat_general",
-                },
-            )
+            context = memory.get_dataset_context(session_id) or {
+                "has_dataset": False,
+                "message": "No hay ningun dataset cargado en esta sesion.",
+                "mode": "chat_general",
+            }
             
             # This calls the Groq API
             response = chat_with_data(message, context, history)
