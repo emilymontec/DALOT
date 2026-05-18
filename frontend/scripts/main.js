@@ -184,7 +184,7 @@ function addMessage(text, sender, id = null) {
 
     msgDiv.innerHTML = avatarHtml + contentHtml;
     chatBox.appendChild(msgDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
+    setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 10);
 }
 
 function usePrompt(prompt) {
@@ -226,7 +226,7 @@ function clearAnalysis() {
 
     const elUploadHint = document.getElementById("upload-hint");
     if (elUploadHint) {
-        elUploadHint.innerHTML = "Sube archivos <code>.csv</code>, <code>.xlsx</code> o <code>.xls</code> para activar las analíticas avanzadas.";
+        elUploadHint.textContent = "Sube archivos CSV o Excel para activar las analíticas avanzadas.";
     }
 
     const elInsightsList = document.getElementById("insights-list");
