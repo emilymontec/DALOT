@@ -177,3 +177,12 @@ def run_agent_system(question: str, context: Dict, history: str, llm_callback) -
             }
         )
     return results
+
+def get_agent_options() -> str:
+    """Return a formatted string of available agents for the LLM router."""
+    options = []
+    for agent in AGENT_REGISTRY.values():
+        options.append(f"- {agent.key}: {agent.name}. Enfoque: {agent.focus}")
+    options.append("- chat: Conversación general o preguntas que no requieren un especialista.")
+    return "\n".join(options)
+

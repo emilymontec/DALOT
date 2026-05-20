@@ -13,7 +13,7 @@ def test_endpoint(request):
     """Health check endpoint."""
     return JsonResponse({"status": "ok", "message": "La API de NURA esta operativa"})
 
-from analytics.analyzer import load_csv, dataset_summary, column_info
+from analytics.analyzer import load_csv, dataset_summary, column_info, compute_correlations
 from analytics.scoring import evaluate_business
 from analytics.trends import analyze_numeric_trends
 from analytics.insights import generate_insights
@@ -35,7 +35,8 @@ def analyze_endpoint(request):
             cols = column_info(df)
             health = evaluate_business(summary)
             trends = analyze_numeric_trends(df)
-            insights = generate_insights(summary, trends, health)
+            correlations = compute_correlations(df)
+            insights = generate_insights(summary, trends, health, correlations)
             
             context = {
                 "file_name": file.name,
@@ -43,6 +44,7 @@ def analyze_endpoint(request):
                 "columns": cols,
                 "health": health,
                 "trends": trends,
+                "correlations": correlations,
                 "insights": insights
             }
             safe_context = make_json_safe(context)

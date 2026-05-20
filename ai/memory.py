@@ -7,7 +7,7 @@ from chat.models import ChatMessage, ChatSession
 class MemoryManager:
     """Persistent conversational memory with compact prompt retrieval."""
 
-    RECENT_MESSAGE_LIMIT = 8
+    RECENT_MESSAGE_LIMIT = 6
     RELEVANT_MESSAGE_LIMIT = 4
     SUMMARY_MESSAGE_LIMIT = 12
     MAX_SUMMARY_CHARS = 2000
